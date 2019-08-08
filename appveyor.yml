@@ -1,0 +1,23 @@
+version: '{branch}.{build}'
+image: Visual Studio 2019
+before_build:
+  - cmd: dotnet --version
+  - cmd: dotnet restore ./src/
+build_script:
+  - cmd: dotnet pack ./src/ -p:NuspecFile=../../Nuget/QueryDesigner.nuspec -c Release
+artifacts:
+  - path: '\src\QueryDesignerCore\bin\Release\*.nupkg'
+    name: drop
+    type: NuGetPackage
+clone_depth: 1
+test_script:
+  - cmd: dotnet restore ./src/QueryDesignerCore.UnitTests/QueryDesignerCore.UnitTests.csproj
+  - cmd: dotnet test ./src/
+deploy:
+- provider: NuGet
+  name: production
+  api_key:
+    secure: 1zciV0BMoo9LscAiQzNEHKsZ5H5liuN1eSO2Mc3nF9mgcgzRN74pYMkvpu6JyquI
+  on:
+    branch: master
+    appveyor_repo_tag: true
