@@ -27,5 +27,10 @@
         /// Value for filtering.
         /// </summary>
         public object Value { get; set; }
+
+        /// <summary>
+        /// Additional setting for filter
+        /// </summary>
+        public WhereFilterSetting Setting { get; set; }
     }
 }

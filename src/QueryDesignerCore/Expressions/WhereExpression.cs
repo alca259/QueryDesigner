@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QueryDesignerCore.Extensions;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -14,6 +15,16 @@ namespace QueryDesignerCore.Expressions
         /// String type.
         /// </summary>
         private static readonly Type StringType = typeof(string);
+
+        /// <summary>
+        /// StringExtension type.
+        /// </summary>
+        private static readonly Type StringExtensionsType = typeof(StringExtensions);
+
+        /// <summary>
+        /// StringComparison enum type.
+        /// </summary>
+        private static readonly Type StringComparisonType = typeof(StringComparison);
 
         /// <summary>
         /// Expression type.
@@ -45,6 +56,11 @@ namespace QueryDesignerCore.Expressions
         /// Info about "Contains" method.
         /// </summary>
         private static readonly MethodInfo ContainsMethod = StringType.GetRuntimeMethod("Contains", new[] { StringType });
+
+        /// <summary>
+        /// Info about "Contains" with StringComparison method.
+        /// </summary>
+        private static readonly MethodInfo ContainsWithStringComparisonMethod = StringExtensionsType.GetRuntimeMethod("Contains", new[] { StringType, StringType, typeof(StringComparison) });
 
         /// <summary>
         /// Info about "EndsWith" method.
@@ -264,7 +280,17 @@ namespace QueryDesignerCore.Expressions
                         Expression.Call(prop, StartsMethod, Expression.Constant(filter.Value, StringType)));
 
                 case WhereFilterType.Contains:
-                    return Expression.Call(prop, ContainsMethod, Expression.Constant(filter.Value, StringType));
+                    {
+                        if(filter.Setting != null && filter.Setting.CaseInsensitive)
+                        {
+                            return Expression.Call(null, ContainsWithStringComparisonMethod,
+                                prop, Expression.Constant(filter.Value, StringType), Expression.Constant(StringComparison.OrdinalIgnoreCase, StringComparisonType));
+                        }
+                        else
+                        {
+                            return Expression.Call(prop, ContainsMethod, Expression.Constant(filter.Value, StringType));
+                        }
+                    }
 
                 case WhereFilterType.NotContains:
                     return Expression.Not(
