@@ -1,15 +1,10 @@
 ﻿namespace QueryDesignerCore
 {
     /// <summary>
-    /// Additional setting for where filter
+    /// Additional setting for order by filter
     /// </summary>
-    public class WhereFilterSetting
+    public class OrderFilterSetting
     {
-        /// <summary>
-        /// Indicate case sensitive when use Contain operator
-        /// </summary>
-        public bool CaseInsensitive { get; set; }
-
         /// <summary>
         /// Supress exception when property cannot be found
         /// </summary>

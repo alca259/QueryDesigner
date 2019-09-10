@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Linq;
 using Xunit;
 
 namespace QueryDesignerCore.UnitTests
 {
-    internal class TestTarget {
-        public string Name { get; set; }
-    }
+
 
     public class WhereFilterTest
     {
@@ -47,6 +44,65 @@ namespace QueryDesignerCore.UnitTests
                 Value = "one",
                 Setting = new WhereFilterSetting {
                     CaseInsensitive = true
+                }
+            };
+
+            var data = new TestTarget[] {
+                new TestTarget { Name = "DataOne" },
+                new TestTarget { Name = "DataTwo" } };
+
+            //Act
+            var actual = data.Where(filter);
+
+            //Assert
+            Assert.Equal(expected.ToJson(), actual.ToJson());
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionWhenPropertyNotFound()
+        {
+            //Arrange
+            var expected = new TestTarget[] {
+                new TestTarget { Name = "DataOne" },
+                new TestTarget { Name = "DataTwo" }
+            };
+
+            var filter = new WhereFilter
+            {
+                Field = "NoSuchProperty",
+                FilterType = WhereFilterType.Contains,
+                Value = "one",
+                Setting = new WhereFilterSetting
+                {
+                    SupressPropertyNotFoundException = false
+                }
+            };
+
+            var data = new TestTarget[] {
+                new TestTarget { Name = "DataOne" },
+                new TestTarget { Name = "DataTwo" } };
+
+            //Act
+            Assert.Throws<InvalidOperationException>(() => data.Where(filter));
+        }
+
+        [Fact]
+        public void ShouldNotThrowExceptionWhenPropertyNotFound()
+        {
+            //Arrange
+            var expected = new TestTarget[] {
+                new TestTarget { Name = "DataOne" },
+                new TestTarget { Name = "DataTwo" }
+            };
+
+            var filter = new WhereFilter
+            {
+                Field = "NoSuchProperty",
+                FilterType = WhereFilterType.Contains,
+                Value = "one",
+                Setting = new WhereFilterSetting
+                {
+                    SupressPropertyNotFoundException = true
                 }
             };
 

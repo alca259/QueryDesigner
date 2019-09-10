@@ -202,15 +202,17 @@ namespace QueryDesignerCore.Expressions
             var s = filter.Field.Split('.');
             Expression prop = e;
 
-            foreach (var t in s)
+            try
             {
-                if (IsEnumerable(prop))
+                foreach (var t in s)
                 {
-                    prop = AsQueryable(prop);
+                    if (IsEnumerable(prop))
+                    {
+                        prop = AsQueryable(prop);
 
-                    var generic = ExpressionMethod.MakeGenericMethod(
-                        prop.Type.GenericTypeArguments.Single());
-                    object[] pars = {
+                        var generic = ExpressionMethod.MakeGenericMethod(
+                            prop.Type.GenericTypeArguments.Single());
+                        object[] pars = {
                     new WhereFilter
                     {
                         Field = t,
@@ -219,17 +221,29 @@ namespace QueryDesignerCore.Expressions
                     },
                     suffix
                     };
-                    var expr = (Expression)generic.Invoke(null, pars);
-                    return Expression.Call(
-                        CollectionAny2.MakeGenericMethod(
-                        prop.Type.GenericTypeArguments.First()),
-                        prop,
-                        expr);
+                        var expr = (Expression)generic.Invoke(null, pars);
+                        return Expression.Call(
+                            CollectionAny2.MakeGenericMethod(
+                            prop.Type.GenericTypeArguments.First()),
+                            prop,
+                            expr);
+                    }
+                    prop = Expression.Property(prop, GetDeclaringProperty(prop, t));
                 }
-                prop = Expression.Property(prop, GetDeclaringProperty(prop, t));
+                var exp = GenerateExpressionOneField(prop, filter);
+                return exp;
             }
-            var exp = GenerateExpressionOneField(prop, filter);
-            return exp;
+            catch(Exception)
+            {
+                if (filter.Setting.SupressPropertyNotFoundException)
+                {
+                    return Expression.Equal(Expression.Constant(true), Expression.Constant(true));
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         /// <summary>

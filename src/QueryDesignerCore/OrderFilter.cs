@@ -22,5 +22,10 @@
         /// Sorting order.
         /// </summary>
         public OrderFilterType Order { get; set; }
+
+        /// <summary>
+        /// Additional setting for order filter
+        /// </summary>
+        public OrderFilterSetting Setting { get; set; }
     }
 }

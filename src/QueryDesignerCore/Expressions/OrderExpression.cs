@@ -68,11 +68,27 @@ namespace QueryDesignerCore.Expressions
             ParameterExpression arg = Expression.Parameter(type, "x" + step);
             Expression expr = arg;
             string[] spl = filter.Field.Split('.');
-            for (int i = 0; i < spl.Length; i++)
+
+            try
             {
-                PropertyInfo pi = GetDeclaringProperty(type, spl[i]);
-                expr = Expression.Property(expr, pi);
-                type = pi.PropertyType;
+                for (int i = 0; i < spl.Length; i++)
+                {
+                    PropertyInfo pi = GetDeclaringProperty(type, spl[i]);
+                    expr = Expression.Property(expr, pi);
+                    type = pi.PropertyType;
+                }
+            }
+            catch(Exception)
+            {
+                if(filter.Setting.SupressPropertyNotFoundException)
+                {
+                    expr = Expression.Constant(0);
+                    type = typeof(int);
+                }
+                else
+                {
+                    throw;
+                }
             }
 
             Type delegateType = typeof(Func<,>).MakeGenericType(typeof(T), type);
