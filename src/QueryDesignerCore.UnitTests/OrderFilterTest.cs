@@ -6,6 +6,32 @@ namespace QueryDesignerCore.UnitTests
     public class OrderFilterTest
     {
         [Fact]
+        public void ShouldOrderByProperty()
+        {
+            //Arrange
+            var expected = new TestTarget[] {
+                new TestTarget { Amount = 2000 },
+                new TestTarget { Amount = 1000 }
+            };
+
+            var filter = new OrderFilter
+            {
+                Field = "Amount",
+                Order = OrderFilterType.Desc
+            };
+
+            var data = new TestTarget[] {
+                new TestTarget { Amount = 1000 },
+                new TestTarget { Amount = 2000 } };
+
+            //Act
+            var actual = data.OrderBy(filter);
+
+            //Assert
+            Assert.Equal(expected.ToJson(), actual.ToJson());
+        }
+
+        [Fact]
         public void ShouldThrowExceptionWhenPropertyNotFound()
         {
             //Arrange

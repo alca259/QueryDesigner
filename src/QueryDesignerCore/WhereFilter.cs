@@ -31,6 +31,6 @@
         /// <summary>
         /// Additional setting for filter
         /// </summary>
-        public WhereFilterSetting Setting { get; set; }
+        public WhereFilterSetting Setting { get; set; } = new WhereFilterSetting();
     }
 }

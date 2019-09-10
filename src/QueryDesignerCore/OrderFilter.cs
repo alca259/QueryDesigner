@@ -26,6 +26,6 @@
         /// <summary>
         /// Additional setting for order filter
         /// </summary>
-        public OrderFilterSetting Setting { get; set; }
+        public OrderFilterSetting Setting { get; set; } = new OrderFilterSetting();
     }
 }
